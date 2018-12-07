@@ -21,7 +21,6 @@ import java.util.Locale;
 public class GameScreenDC extends AppCompatActivity {
 
     private Button button;
-    private MediaPlayer dcTheme;
 
     ImageView iv_11, iv_12, iv_13, iv_14, iv_15, iv_16, iv_17, iv_18, iv_19, iv_20, iv_21, iv_22;
 

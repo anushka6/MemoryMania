@@ -19,7 +19,6 @@ import java.util.Locale;
 
 public class GameScreenMarvel extends AppCompatActivity {
 
-    private MediaPlayer marvelTheme;
     private Button button;
 
     ImageView iv_11, iv_12, iv_13, iv_14, iv_15, iv_16, iv_17, iv_18, iv_19, iv_20, iv_21, iv_22;
