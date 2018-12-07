@@ -2,6 +2,7 @@ package com.example.sruthijayanti.memorymania2018;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -10,8 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.media.MediaPlayer;
+import android.widget.TextView;
+
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 
 
 public class GameScreenDC extends AppCompatActivity {
@@ -32,6 +36,14 @@ public class GameScreenDC extends AppCompatActivity {
     int clickedFirst, clickedSecond;
     int cardNumber = 1;
 
+    private static final long START_TIME_IN_MILLIS = 40000;
+
+    private TextView TextViewCountDown;
+    private Button startButton;
+    private CountDownTimer countDownTimer;
+    private boolean timerRunning;
+    private long timeLeftInMillis = START_TIME_IN_MILLIS;
+
 
 
     @Override
@@ -39,17 +51,29 @@ public class GameScreenDC extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen_dc);
 
-        dcTheme = MediaPlayer.create(this, R.raw.dctheme);
-        dcTheme.setLooping(true);
-        dcTheme.start();
+        TextViewCountDown = findViewById(R.id.text_view_countdown);
+        startButton = findViewById(R.id.button2);
 
-        button = (Button) findViewById(R.id.button2);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (timerRunning) {
+                    startButton.setVisibility(View.INVISIBLE);
+                } else {
+                    startTimer();
+                }
+            }
+        });
+
+        button = (Button) findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openMainScreen();
             }
         });
+
+
 
         iv_11 = (ImageView) findViewById(R.id.iv_11);
         iv_12 = (ImageView) findViewById(R.id.iv_12);
@@ -180,6 +204,7 @@ public class GameScreenDC extends AppCompatActivity {
         });
 
     }
+
 
     private void checkMatch(ImageView iv, int card) {
         //set correct image to imageview
@@ -352,6 +377,10 @@ public class GameScreenDC extends AppCompatActivity {
                 iv_21.getVisibility() == View.INVISIBLE &&
                 iv_22.getVisibility() == View.INVISIBLE) {
 
+            countDownTimer.cancel();
+            timerRunning = false;
+
+
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(GameScreenDC.this);
             alertDialogBuilder
                     .setMessage("You have completed this (Challen)ge!")
@@ -395,4 +424,53 @@ public class GameScreenDC extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                updateCountDownText();
+            }
+
+            @Override
+            public void onFinish() {
+                timerRunning = false;
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(GameScreenDC.this);
+                alertDialogBuilder
+                        .setMessage("Sorry! You failed the (Challen)ge!")
+                        .setCancelable(false)
+                        .setPositiveButton("Play Again", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(getApplicationContext(), GameScreenDC.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
+            }
+        }.start();
+
+        timerRunning = true;
+        startButton.setVisibility(View.INVISIBLE);
+    }
+
+   private void updateCountDownText() {
+        int minutes = (int) (timeLeftInMillis / 1000) / 60;
+        int seconds = (int) (timeLeftInMillis / 1000) % 60;
+
+        String timeLeftFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+
+        TextViewCountDown.setText(timeLeftFormatted);
+   }
 }
